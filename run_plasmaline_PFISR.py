@@ -533,9 +533,10 @@ def cal_pl(EXP,INT,LONGPULSE,PLfile,ILfname,ILdir,doChap=-1,usePower=-1,ST='',Il
     pylab.title('%d (%2.2f,%2.2f)' % (bmcode[0],bmcode[1],bmcode[2]))
     pylab.xlim([(timepl.min()-1000),(timepl.max()+1000)])
     pylab.ylim([1e10,1e12])
-    
+
     pylab.subplot(212)
-    pylab.errorbar(timepl,KsysCor,yerr=KsysErr, marker='s', mfc='red', mec='green', ms=4, mew=1,fmt='k.')
+    pylab.errorbar(timepl,KsysCor,yerr=KsysErr, marker='s', mfc='red',
+                   mec='green', ms=4, mew=1,fmt='k.')
     v=pylab.axis()
     pylab.plot(v[0:2],[Ksys_med,Ksys_med],'k')
     pylab.plot(v[0:2],[Ksys_med+Ksys_std,Ksys_med+Ksys_std],'k--')
@@ -545,7 +546,7 @@ def cal_pl(EXP,INT,LONGPULSE,PLfile,ILfname,ILdir,doChap=-1,usePower=-1,ST='',Il
     pylab.xlim([(timepl.min()-1000),(timepl.max()+1000)])
     pylab.ylim([0,2])
     pylab.show()
-    
+
     pylab.gcf().savefig(os.path.join(ILdir,oname+'.png'))
 
 #   pylab.figure()
@@ -857,36 +858,44 @@ def batchImagePl():
                 if dualpl:
                     pl_dn=scipy.signal.medfilt2d(pl_dn, kernel_size=KS)
 
-                tmp1=datetime.datetime.utcfromtimestamp(time_up[0]); r1=datetime.datetime(tmp1.year,tmp1.month,tmp1.day, tmp1.hour, tmp1.minute, tmp1.second)
+                tmp1=datetime.datetime.utcfromtimestamp(time_up[0])
+                r1=datetime.datetime(tmp1.year,tmp1.month,tmp1.day, tmp1.hour,
+                        tmp1.minute, tmp1.second)
                 x_up=tmp1.strftime('Secs from %D %H:%M:%S')
-                
+
                 pylab.figure(figg1.number)
                 pylab.subplot(211)
-                pylab.imshow(pl_up,vmin=0,vmax=clim[0],aspect='auto',origin='lower',extent=[freq_up[0]/1.0e6,freq_up[-1]/1.0e6,0,time_up[-1]-time_up[0]])    
+                pylab.imshow(pl_up,vmin=0,vmax=clim[0],aspect='auto',
+                        origin='lower',extent=[freq_up[0]/1.0e6,
+                            freq_up[-1]/1.0e6,0,time_up[-1]-time_up[0]])
                 pylab.colorbar()
                 ax1=pylab.gca()
                 ax1.set_ylabel(x_up)
                 ax1.set_xlabel('Freq (MHz)')
-                pylab.title('%d (%2.2f,%2.2f) - %2.2f km' % (bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0))
-               
+                pylab.title('%d (%2.2f,%2.2f) - %2.2f km' % (bmcode[0],
+                            bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0))
+
                 if dualpl:
-                
+
                     #tmp1=datetime.datetime.utcfromtimestamp(time_dn[0]); r1=datetime.datetime(tmp1.year,tmp1.month,tmp1.day, tmp1.hour, tmp1.minute, tmp1.second)
                     #x_dn=tmp1.strftime('Secs from %D %H:%M:%S')
-                
+
                     pylab.subplot(212)
-                    pylab.imshow(pl_dn,vmin=0,vmax=clim[1],aspect='auto',origin='lower',extent=[freq_dn[0]/1.0e6,freq_dn[-1]/1.0e6,0,time_dn[-1]-time_dn[0]])
+                    pylab.imshow(pl_dn,vmin=0,vmax=clim[1],aspect='auto',
+                                 origin='lower',extent=[freq_dn[0]/1.0e6,
+                                 freq_dn[-1]/1.0e6,0,time_dn[-1]-time_dn[0]])
                     pylab.colorbar()
                     ax2=pylab.gca()
                     #ax2.set_ylabel(x_dn)
                     ax2.set_xlabel('Freq (MHz)')
 
                 pylab.show()
-            
+
                 if 1==1:
-                            
-                    oname='%s-%d-plline-%.3dkm_%.4d-%.4d' % (EXP,bmcode[0],int(alt_pl[Ialt]/1000.0),StartI,EndI) 
-                    
+
+                    oname='%s-%d-plline-%.3dkm_%.4d-%.4d' % (EXP,bmcode[0],
+                            int(alt_pl[Ialt]/1000.0),StartI,EndI)
+
                     try:
                         figg1.savefig(os.path.join(ODIR,oname+'.png'))
                     except:
@@ -1831,7 +1840,7 @@ if __name__ == '__main__':
                             for aa in range(len(Cpldn.pl_x)):
                                 fH.write('%.1f %.3f\n' % (Cpldn.pl_y[aa],
                                                            Cpldn.pl_x[aa]))
-            
+
                         fH.close()
 
                     except:
