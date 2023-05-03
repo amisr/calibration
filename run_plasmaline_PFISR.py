@@ -63,12 +63,12 @@ class iplot:
         self.fig = fig
         self.ax = ax
         return
-        
-    def __call__(self,event):
-        clickx=event.xdata
-        clicky=event.ydata
 
-        if event.button==1 and event.inaxes: # and tb.mode == '':
+    def __call__(self,event):
+        clickx = event.xdata
+        clicky = event.ydata
+
+        if event.button == 1 and event.inaxes: # and tb.mode == '':
             self.pl_x.append(clickx)
             self.pl_y.append(clicky)
             #pyplot.ioff()
@@ -1858,6 +1858,14 @@ if __name__ == '__main__':
 
                     try:
                         figg1.savefig(os.path.join(ODIR,oname+'.png'))
+                    except:
+                        print('Could not save plot'             )
+                    try:
+                        # save without the dots
+                        for ax in figg1.get_axes():
+                            for dot in ax.lines:
+                                ax.lines.remove(dot)
+                        figg1.savefig(os.path.join(ODIR,oname+'_nodots.png'))
                     except:
                         print('Could not save plot'             )
 
