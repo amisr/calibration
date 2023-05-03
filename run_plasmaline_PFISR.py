@@ -81,7 +81,8 @@ class iplot:
 
     def remove_dots(self):
         for dot in self.dots:
-            self.ax.lines.remove(dot[0])
+            #self.ax.lines.remove(dot[0])
+            dot[0].remove()
         self.dots = []
 
 def freq2ne(freq,Te=1000.0,f0=450.0e6,B=50000e-9,alph=0.0):
@@ -1791,6 +1792,7 @@ if __name__ == '__main__':
                             pm = ax1.pcolormesh(frup,tup,pl_up,vmin=blim[0],vmax=clim[0])
                             figg1.colorbar(pm)
 
+                            errorbars = []
                             if plotfitted:
                                 temp_diff=np.absolute(alt_pl[Ialt] - data_altitude[jjj,])
                                 alt_ind=np.where(temp_diff==np.nanmin(temp_diff))[0]
@@ -1798,11 +1800,11 @@ if __name__ == '__main__':
                                 fpe = np.squeeze(fitted_plasma_frequency_error[:,jjj,alt_ind])
                                 fp.reshape(data_time.shape[0])
                                 fpe.reshape(data_time.shape[0])
-                                ax1.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
+                                errorbars.append(ax1.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
                                         color=marker_colour,ls='none',marker='o',mfc=marker_colour,
                                         alpha = overlay_alpha, elinewidth=elinewidth,
                                         markeredgewidth=markeredgewidth,capsize=capsize,
-                                        mec=marker_colour,ms=marker_size)
+                                        mec=marker_colour,ms=marker_size))
                                 print("Data altitude: %s km" % str(data_altitude[jjj,alt_ind][0] / 1000.0))
 
                             ax1.set_xlim([freq_up[0]/1e6,freq_up[-1]/1e6])
@@ -1825,11 +1827,11 @@ if __name__ == '__main__':
                                     fpe = np.squeeze(fitted_plasma_frequency_error[:,jjj,alt_ind])
                                     fp.reshape(data_time.shape[0])
                                     fpe.reshape(data_time.shape[0])
-                                    ax2.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
+                                    errorbars.append(ax2.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
                                             color=marker_colour,ls='none',marker='o',mfc=marker_colour,
                                             alpha = overlay_alpha, elinewidth=elinewidth,
                                             markeredgewidth=markeredgewidth,capsize=capsize,
-                                            mec=marker_colour,ms=marker_size)
+                                            mec=marker_colour,ms=marker_size))
 
                                 ax2.set_xlim([freq_dn[0]/1e6,freq_dn[-1]/1e6])
                                 ax2.set_ylim([0,time_dn[-1]-time_dn[0]])
@@ -1869,6 +1871,10 @@ if __name__ == '__main__':
                         Cplup.remove_dots()
                         if dualpl:
                             Cpldn.remove_dots()
+                        # remove ISR error bars
+                        for errorbar0 in errorbars:
+                            errorbar0[0].remove() # remove the dots and lines
+                            errorbar0[-1].remove() # remove the error bars
                         figg1.savefig(os.path.join(ODIR,oname+'_nodots.png'))
                     except:
                         print('Could not save plot'             )
