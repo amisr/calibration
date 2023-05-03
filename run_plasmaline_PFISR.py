@@ -62,6 +62,7 @@ class iplot:
         self.pl_y=[]
         self.fig = fig
         self.ax = ax
+        self.dots = []
         return
 
     def __call__(self,event):
@@ -73,12 +74,15 @@ class iplot:
             self.pl_y.append(clicky)
             #pyplot.ioff()
             #v = pyplot.axis()
-            self.ax.plot(clickx,clicky,'.w')
+            self.dots.append(self.ax.plot(clickx,clicky,'.w', markersize=3))
             #pyplot.axis(v)
             self.fig.canvas.draw_idle()
             #pyplot.show()
 
-
+    def remove_dots(self):
+        for dot in self.dots:
+            self.ax.lines.remove(dot[0])
+        self.dots = []
 
 def freq2ne(freq,Te=1000.0,f0=450.0e6,B=50000e-9,alph=0.0):
     k=4*math.pi/v_lightspeed*f0
@@ -1862,9 +1866,9 @@ if __name__ == '__main__':
                         print('Could not save plot'             )
                     try:
                         # save without the dots
-                        for ax in figg1.get_axes():
-                            for dot in ax.lines:
-                                ax.lines.remove(dot)
+                        Cplup.remove_dots()
+                        if dualpl:
+                            Cpldn.remove_dots()
                         figg1.savefig(os.path.join(ODIR,oname+'_nodots.png'))
                     except:
                         print('Could not save plot'             )
