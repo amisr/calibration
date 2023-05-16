@@ -29,6 +29,7 @@ import scipy.integrate
 import scipy.fftpack
 import scipy.ndimage
 import glob
+import traceback
 
 # python2 and 3
 try:
@@ -988,8 +989,6 @@ if __name__ == '__main__':
     radarmode = 'PLCal30'
     experiment = '20221222.012'
     
-    radarmode = 'PLCal30'
-    experiment = '20230208.003'
     
     radarmode = 'PLCal30'
     experiment = '20230126.007'
@@ -1005,6 +1004,10 @@ if __name__ == '__main__':
     experiment = '20230429.002'
     ptype_intg = "lp_5min"
     #ptype_intg = "lp_3min"
+    
+    radarmode = 'PLCal30'
+    experiment = '20230208.003'
+    ptype_intg = "lp_5min"
     
     syear = experiment[:4]
     smonth = experiment[4:6]
@@ -1638,6 +1641,7 @@ if __name__ == '__main__':
                 pm = ax1.pcolormesh(frup,tup,pl_up,vmin=blim[0],vmax=clim[0])
                 figg1.colorbar(pm)
 
+                errorbars = []
                 if plotfitted:
                     temp_diff   = np.absolute(alt_pl[Ialt] - data_altitude[jjj,:])
                     alt_ind     = np.where(temp_diff==np.nanmin(temp_diff))[0]
@@ -1645,18 +1649,21 @@ if __name__ == '__main__':
                     fpe         = np.squeeze(fitted_plasma_frequency_error[:,jjj,alt_ind])
                     fp.reshape(data_time.shape[0])
                     fpe.reshape(data_time.shape[0])
-                    ax1.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
+                    errorbars.append(
+                            ax1.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
                             color=marker_colour,ls='none',marker='o',
                             alpha = overlay_alpha, elinewidth=elinewidth,
                             markeredgewidth=markeredgewidth,capsize=capsize,
                             mfc=marker_colour,mec=marker_colour,ms=marker_size)
+                            )
                     print("Data altitude: %s km" % str(data_altitude[jjj,alt_ind][0] / 1000.0))
 
                 ax1.set_xlim([freq_up[0]/1e6,freq_up[-1]/1e6])
                 ax1.set_ylim([0.0,time_up[-1]-time_up[0]])
                 ax1.set_ylabel(x_up)
                 ax1.set_xlabel('Freq (MHz)')
-                figg1.suptitle('%d (%2.2f,%2.2f) - %2.2f km' % (bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0))
+                figg1.suptitle('%d (%2.2f,%2.2f) - %2.2f km, ISR factor=%.2f' % (
+                    bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0, factor))
                
                 if dualpl:
                     ax2 = figg1.add_subplot(bottomsubplot)
@@ -1671,11 +1678,14 @@ if __name__ == '__main__':
                         fpe = np.squeeze(fitted_plasma_frequency_error[:,jjj,alt_ind])
                         fp.reshape(data_time.shape[0])
                         fpe.reshape(data_time.shape[0])
-                        ax2.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
-                                color=marker_colour,ls='none',marker='o',mfc=marker_colour,
+                        errorbars.append(
+                            ax2.errorbar(fp*factor,data_time-time_up[0],xerr=fpe*factor,
+                                color=marker_colour,ls='none',marker='o',
+                                mfc=marker_colour,
                                 alpha = overlay_alpha, elinewidth=elinewidth,
                                 markeredgewidth=markeredgewidth,capsize=capsize,
                                 mec=marker_colour,ms=marker_size)
+                            )
 
                     ax2.set_xlim([freq_dn[0]/1e6,freq_dn[-1]/1e6])
                     ax2.set_ylim([0.0,time_dn[-1]-time_dn[0]])
@@ -1865,7 +1875,7 @@ if __name__ == '__main__':
                     try:
                         figg1.savefig(os.path.join(ODIR,oname+'.png'))
                     except:
-                        print('Could not save plot'             )
+                        print('Could not save plot with dots and ISR'             )
                     try:
                         # save without the dots
                         Cplup.remove_dots()
@@ -1873,12 +1883,14 @@ if __name__ == '__main__':
                             Cpldn.remove_dots()
                         # remove ISR error bars
                         for errorbar0 in errorbars:
-                            errorbar0[0].remove() # remove the dots and lines
-                            errorbar0[-1].remove() # remove the error bars
+                            if type(errorbar0) != tuple:
+                                errorbar0 = (errorbar0,)
+                            for errorbar00 in errorbar0:
+                                errorbar00.remove()
                         figg1.savefig(os.path.join(ODIR,oname+'_nodots.png'))
-                    except:
-                        print('Could not save plot'             )
-
+                    except Exception as e:
+                        print('Could not save plot with removed dots and ISR'             )
+                        print(traceback.format_exception(*sys.exc_info()))
                     try:
                         fH=open(os.path.join(ODIR,oname+'.txt'),'w') 
                         fH.write('%d %f %f %f %f\n' % (bmcode[0],bmcode[1],
