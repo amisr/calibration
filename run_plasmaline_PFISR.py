@@ -1002,12 +1002,13 @@ if __name__ == '__main__':
     experiment = '20230330.003'
     experiment = '20230414.003'
     experiment = '20230429.002'
+    experiment = '20230515.002'
     ptype_intg = "lp_5min"
     #ptype_intg = "lp_3min"
     
-    radarmode = 'PLCal30'
-    experiment = '20230208.003'
-    ptype_intg = "lp_5min"
+    #radarmode = 'PLCal30'
+    #experiment = '20230208.003'
+    #ptype_intg = "lp_5min"
     
     syear = experiment[:4]
     smonth = experiment[4:6]
@@ -1664,7 +1665,7 @@ if __name__ == '__main__':
                 ax1.set_xlabel('Freq (MHz)')
                 figg1.suptitle('%d (%2.2f,%2.2f) - %2.2f km, ISR factor=%.2f' % (
                     bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0, factor))
-               
+
                 if dualpl:
                     ax2 = figg1.add_subplot(bottomsubplot)
                     pm = ax2.pcolormesh(frdn,tdn,pl_dn,vmin=blim[1],vmax=clim[1])
@@ -1821,7 +1822,8 @@ if __name__ == '__main__':
                             ax1.set_ylim([0.0,time_up[-1]-time_up[0]])
                             ax1.set_ylabel(x_up)
                             ax1.set_xlabel('Freq (MHz) down-shifted band')
-                            figg1.suptitle('%d (%2.2f,%2.2f) - %2.2f km' % (bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0))
+                            figg1.suptitle('%d (%2.2f,%2.2f) - %2.2f km, ISR factor=%.2f' % (
+                                bmcode[0],bmcode[1],bmcode[2],alt_pl[Ialt]/1000.0, factor))
 
 
                             if dualpl:
